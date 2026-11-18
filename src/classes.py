@@ -5,6 +5,14 @@ class Product:
         self.__price = price
         self.quantity = quantity
 
+    def __str__(self) -> str:
+        return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other):
+        if type(other) is Product:
+            return (self.__price * self.quantity) + (other.__price * other.quantity)
+        raise TypeError("Складывать можно только объекты класса Product")
+
     @classmethod
     def new_product(cls, product_data: dict):
         return cls(
@@ -38,6 +46,12 @@ class Category:
         Category.category_count += 1
         Category.product_count += len(self.__products)
 
+    def __str__(self) -> str:
+        total_quantity = 0
+        for product in self.__products:
+            total_quantity += product.quantity
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
     def add_product(self, product: Product):
         if isinstance(product, Product):
             self.__products.append(product)
@@ -47,5 +61,5 @@ class Category:
     def products(self) -> str:
         product_str = ""
         for product in self.__products:
-            product_str += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
+            product_str += f"{str(product)}\n"
         return product_str

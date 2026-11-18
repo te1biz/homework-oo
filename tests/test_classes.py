@@ -76,3 +76,21 @@ def test_add_product(sample_category):
         "Xiaomi Redmi Note 11, 31000.0 руб. Остаток: 14 шт.\n"
     )
     assert sample_category.products == expected
+
+
+def test_product_str(sample_product):
+    assert str(sample_product) == "Samsung Galaxy S23 Ultra, 180000.0 руб. Остаток: 5 шт."
+
+
+def test_category_str(sample_category):
+    assert str(sample_category) == "Смартфоны, количество продуктов: 5 шт."
+
+
+def test_product_add(sample_product):
+    other_product = Product("Iphone 15", "512GB, Gray space", 210000.0, 2)
+    assert sample_product + other_product == 1320000.0
+
+
+def test_product_add_invalid(sample_product):
+    with pytest.raises(TypeError):
+        _ = sample_product + 100
