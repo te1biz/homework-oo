@@ -9,9 +9,9 @@ class Product:
         return f"{self.name}, {self.__price} руб. Остаток: {self.quantity} шт."
 
     def __add__(self, other):
-        if type(other) is Product:
-            return (self.__price * self.quantity) + (other.__price * other.quantity)
-        raise TypeError("Складывать можно только объекты класса Product")
+        if type(other) is type(self):
+            return (self.price * self.quantity) + (other.price * other.quantity)
+        raise TypeError("Можно складывать только товары одного класса")
 
     @classmethod
     def new_product(cls, product_data: dict):
@@ -34,6 +34,23 @@ class Product:
             print("Цена не должна быть нулевая или отрицательная")
 
 
+class Smartphone(Product):
+    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+
+class LawnGrass(Product):
+    def __init__(self, name, description, price, quantity, country, germination_period, color):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
+
 class Category:
     category_count = 0
     product_count = 0
@@ -41,10 +58,13 @@ class Category:
     def __init__(self, name: str, description: str, products: list = None):
         self.name = name
         self.description = description
-        self.__products = products if products is not None else []
+        self.__products = []
+
+        if products is not None:
+            for product in products:
+                self.add_product(product)
 
         Category.category_count += 1
-        Category.product_count += len(self.__products)
 
     def __str__(self) -> str:
         total_quantity = 0
@@ -52,10 +72,12 @@ class Category:
             total_quantity += product.quantity
         return f"{self.name}, количество продуктов: {total_quantity} шт."
 
-    def add_product(self, product: Product):
+    def add_product(self, product):
         if isinstance(product, Product):
             self.__products.append(product)
             Category.product_count += 1
+        else:
+            raise TypeError("Можно добавлять только объекты класса Product и его наследников")
 
     @property
     def products(self) -> str:
