@@ -1,5 +1,5 @@
 import pytest
-from src.classes import Product, Category, Smartphone, LawnGrass
+from src.classes import Category, LawnGrass, Product, Smartphone
 
 
 @pytest.fixture
@@ -16,6 +16,26 @@ def sample_category(sample_product):
         "Смартфоны, как средство не только коммуникации, но и получения дополнительных функций для удобства жизни",
         [sample_product],
     )
+
+
+@pytest.fixture
+def smartphone1():
+    return Smartphone("Samsung Galaxy S23", "256GB", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
+
+
+@pytest.fixture
+def smartphone2():
+    return Smartphone("Iphone 15", "512GB", 210000.0, 8, 98.2, "15", 512, "Gray space")
+
+
+@pytest.fixture
+def grass1():
+    return LawnGrass("Газонная трава", "Элитная", 500.0, 20, "Россия", "7 дней", "Зеленый")
+
+
+@pytest.fixture
+def grass2():
+    return LawnGrass("Газонная трава 2", "Выносливая", 450.0, 15, "США", "5 дней", "Темно-зеленый")
 
 
 def test_product_init(sample_product):
@@ -95,60 +115,49 @@ def test_product_add_invalid(sample_product):
     with pytest.raises(TypeError):
         _ = sample_product + 100
 
-        @pytest.fixture
-        def smartphone1():
-            return Smartphone("Samsung Galaxy S23", "256GB", 180000.0, 5, 95.5, "S23 Ultra", 256, "Серый")
 
-        @pytest.fixture
-        def smartphone2():
-            return Smartphone("Iphone 15", "512GB", 210000.0, 8, 98.2, "15", 512, "Gray space")
+def test_smartphone_init(smartphone1):
+    assert smartphone1.name == "Samsung Galaxy S23"
+    assert smartphone1.description == "256GB"
+    assert smartphone1.price == 180000.0
+    assert smartphone1.quantity == 5
+    assert smartphone1.efficiency == 95.5
+    assert smartphone1.model == "S23 Ultra"
+    assert smartphone1.memory == 256
+    assert smartphone1.color == "Серый"
 
-        @pytest.fixture
-        def grass1():
-            return LawnGrass("Газонная трава", "Элитная", 500.0, 20, "Россия", "7 дней", "Зеленый")
 
-        @pytest.fixture
-        def grass2():
-            return LawnGrass("Газонная трава 2", "Выносливая", 450.0, 15, "США", "5 дней", "Темно-зеленый")
+def test_lawn_grass_init(grass1):
+    assert grass1.name == "Газонная трава"
+    assert grass1.description == "Элитная"
+    assert grass1.price == 500.0
+    assert grass1.quantity == 20
+    assert grass1.country == "Россия"
+    assert grass1.germination_period == "7 дней"
+    assert grass1.color == "Зеленый"
 
-        def test_smartphone_init(smartphone1):
-            assert smartphone1.name == "Samsung Galaxy S23"
-            assert smartphone1.description == "256GB"
-            assert smartphone1.price == 180000.0
-            assert smartphone1.quantity == 5
-            assert smartphone1.efficiency == 95.5
-            assert smartphone1.model == "S23 Ultra"
-            assert smartphone1.memory == 256
-            assert smartphone1.color == "Серый"
 
-        def test_lawn_grass_init(grass1):
-            assert grass1.name == "Газонная трава"
-            assert grass1.description == "Элитная"
-            assert grass1.price == 500.0
-            assert grass1.quantity == 20
-            assert grass1.country == "Россия"
-            assert grass1.germination_period == "7 дней"
-            assert grass1.color == "Зеленый"
+def test_add_same_class_products(smartphone1, smartphone2, grass1, grass2):
+    assert smartphone1 + smartphone2 == 2580000.0
+    assert grass1 + grass2 == 16750.0
 
-        def test_add_same_class_products(smartphone1, smartphone2, grass1, grass2):
-            assert smartphone1 + smartphone2 == 2580000.0
-            assert grass1 + grass2 == 16750.0
 
-        def test_add_different_class_products(smartphone1, grass1, sample_product):
-            with pytest.raises(TypeError):
-                _ = smartphone1 + grass1
-            with pytest.raises(TypeError):
-                _ = smartphone1 + sample_product
+def test_add_different_class_products(smartphone1, grass1, sample_product):
+    with pytest.raises(TypeError):
+        _ = smartphone1 + grass1
+    with pytest.raises(TypeError):
+        _ = smartphone1 + sample_product
 
-        def test_category_add_valid_products(smartphone1, grass1):
-            category = Category("Тест", "Описание", [smartphone1])
-            category.add_product(grass1)
-            assert len(category.products.splitlines()) == 2
 
-        def test_category_add_invalid_object():
-            category = Category("Тест", "Описание", [])
-            with pytest.raises(TypeError):
-                category.add_product("Не продукт")
-            with pytest.raises(TypeError):
-                Category("Тест", "Описание", ["Не продукт"])
+def test_category_add_valid_products(smartphone1, grass1):
+    category = Category("Тест", "Описание", [smartphone1])
+    category.add_product(grass1)
+    assert len(category.products.splitlines()) == 2
 
+
+def test_category_add_invalid_object():
+    category = Category("Тест", "Описание", [])
+    with pytest.raises(TypeError):
+        category.add_product("Не продукт")
+    with pytest.raises(TypeError):
+        Category("Тест", "Описание", ["Не продукт"])
