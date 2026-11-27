@@ -65,7 +65,7 @@ def test_price_setter_valid(sample_product):
 
 
 def test_price_setter_invalid(sample_product, capsys):
-    capsys.readouterr()  # Очищаем вывод от создания sample_product через PrintMixin
+    capsys.readouterr()
 
     sample_product.price = 0
     captured = capsys.readouterr()
@@ -187,3 +187,21 @@ def test_base_product_is_abstract():
     assert issubclass(Product, BaseProduct)
     with pytest.raises(TypeError):
         BaseProduct()
+
+
+def test_product_zero_quantity():
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Бракованный товар", "Неизвестное описание", 1000.0, 0)
+
+
+def test_category_middle_price(sample_category):
+    assert sample_category.middle_price() == 180000.0
+
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    sample_category.add_product(product2)
+    assert sample_category.middle_price() == 195000.0
+
+
+def test_category_middle_price_empty():
+    empty_category = Category("Пустая категория", "Описание пустой категории", [])
+    assert empty_category.middle_price() == 0
