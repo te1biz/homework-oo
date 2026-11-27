@@ -1,5 +1,5 @@
 import pytest
-from src.classes import Category, LawnGrass, Product, Smartphone
+from src.classes import BaseProduct, Category, LawnGrass, Product, Smartphone
 
 
 @pytest.fixture
@@ -65,6 +65,8 @@ def test_price_setter_valid(sample_product):
 
 
 def test_price_setter_invalid(sample_product, capsys):
+    capsys.readouterr()  # Очищаем вывод от создания sample_product через PrintMixin
+
     sample_product.price = 0
     captured = capsys.readouterr()
     assert captured.out.strip() == "Цена не должна быть нулевая или отрицательная"
@@ -161,3 +163,27 @@ def test_category_add_invalid_object():
         category.add_product("Не продукт")
     with pytest.raises(TypeError):
         Category("Тест", "Описание", ["Не продукт"])
+
+
+def test_print_mixin_product(capsys):
+    Product("Телефон", "Описание", 10000.0, 5)
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Product('Телефон', 'Описание', 10000.0, 5)"
+
+
+def test_print_mixin_smartphone(capsys):
+    Smartphone("iPhone", "Смартфон", 100000.0, 2, 95.5, "15 Pro", 256, "Титановый")
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Smartphone('iPhone', 'Смартфон', 100000.0, 2)"
+
+
+def test_print_mixin_lawn_grass(capsys):
+    LawnGrass("Газон", "Трава", 500.0, 10, "Россия", "7 дней", "Зеленый")
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "LawnGrass('Газон', 'Трава', 500.0, 10)"
+
+
+def test_base_product_is_abstract():
+    assert issubclass(Product, BaseProduct)
+    with pytest.raises(TypeError):
+        BaseProduct()
