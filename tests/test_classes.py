@@ -1,5 +1,5 @@
 import pytest
-from src.classes import Category, LawnGrass, Product, Smartphone
+from src.classes import BaseProduct, Category, LawnGrass, Product, Smartphone
 
 
 @pytest.fixture
@@ -65,6 +65,8 @@ def test_price_setter_valid(sample_product):
 
 
 def test_price_setter_invalid(sample_product, capsys):
+    capsys.readouterr()
+
     sample_product.price = 0
     captured = capsys.readouterr()
     assert captured.out.strip() == "Цена не должна быть нулевая или отрицательная"
@@ -161,3 +163,45 @@ def test_category_add_invalid_object():
         category.add_product("Не продукт")
     with pytest.raises(TypeError):
         Category("Тест", "Описание", ["Не продукт"])
+
+
+def test_print_mixin_product(capsys):
+    Product("Телефон", "Описание", 10000.0, 5)
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Product('Телефон', 'Описание', 10000.0, 5)"
+
+
+def test_print_mixin_smartphone(capsys):
+    Smartphone("iPhone", "Смартфон", 100000.0, 2, 95.5, "15 Pro", 256, "Титановый")
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Smartphone('iPhone', 'Смартфон', 100000.0, 2)"
+
+
+def test_print_mixin_lawn_grass(capsys):
+    LawnGrass("Газон", "Трава", 500.0, 10, "Россия", "7 дней", "Зеленый")
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "LawnGrass('Газон', 'Трава', 500.0, 10)"
+
+
+def test_base_product_is_abstract():
+    assert issubclass(Product, BaseProduct)
+    with pytest.raises(TypeError):
+        BaseProduct()
+
+
+def test_product_zero_quantity():
+    with pytest.raises(ValueError, match="Товар с нулевым количеством не может быть добавлен"):
+        Product("Бракованный товар", "Неизвестное описание", 1000.0, 0)
+
+
+def test_category_middle_price(sample_category):
+    assert sample_category.middle_price() == 180000.0
+
+    product2 = Product("Iphone 15", "512GB, Gray space", 210000.0, 8)
+    sample_category.add_product(product2)
+    assert sample_category.middle_price() == 195000.0
+
+
+def test_category_middle_price_empty():
+    empty_category = Category("Пустая категория", "Описание пустой категории", [])
+    assert empty_category.middle_price() == 0
